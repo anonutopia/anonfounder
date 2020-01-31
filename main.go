@@ -20,9 +20,15 @@ func main() {
 
 	wnc = initWaves()
 
-	ab, _ := wnc.AddressesBalance("3PLJQASFXtiohqbirYwSswjjbYGLfaGDEQy")
+	ab, _ := wnc.AddressesBalance(conf.NodeAddress)
 
-	db.FirstOrCreate(&KeyValue{Key: "test", ValueInt: 25})
+	kv := &KeyValue{Key: "test", ValueInt: 65}
+
+	db.FirstOrCreate(kv)
+
+	kv.ValueInt = 65
+
+	db.Save(kv)
 
 	log.Println(ab.Balance)
 }

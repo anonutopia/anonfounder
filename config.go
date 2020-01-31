@@ -6,13 +6,15 @@ import (
 	"os"
 )
 
+// Config struct holds all our configuration
 type Config struct {
-	WavesNodeApiKey string `json:"wavesnode_apikey"`
+	WavesNodeAPIKey string `json:"waves_node_api_key"`
 	NodeAddress     string `json:"node_address"`
 	Debug           bool   `json:"debug"`
-	Telegram        string `json:"telegram"`
+	TelegramAPIKey  string `json:"telegram_api_key"`
 }
 
+// Load method loads configuration file to Config struct
 func (sc *Config) Load(configFile string) error {
 	file, err := os.Open(configFile)
 
