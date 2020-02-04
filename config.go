@@ -12,6 +12,7 @@ type Config struct {
 	NodeAddress     string `json:"node_address"`
 	Debug           bool   `json:"debug"`
 	TelegramAPIKey  string `json:"telegram_api_key"`
+	InitialPrice    uint64 `json:"initial_price"`
 }
 
 // Load method loads configuration file to Config struct

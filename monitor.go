@@ -44,8 +44,7 @@ func (wm *WavesMonitor) processTransaction(tr *Transaction, t *gowaves.Transacti
 		t.Sender != conf.NodeAddress &&
 		t.Recipient == conf.NodeAddress &&
 		len(t.AssetID) == 0 {
-		log.Println(tr)
-		log.Println(t)
+		log.Println(t.Recipient)
 	}
 
 	tr.Processed = true
