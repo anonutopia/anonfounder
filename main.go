@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/anonutopia/gowaves"
 	"github.com/jinzhu/gorm"
+	macaron "gopkg.in/macaron.v1"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
@@ -14,6 +15,8 @@ var db *gorm.DB
 
 var bot *tgbotapi.BotAPI
 
+var m *macaron.Macaron
+
 func main() {
 	conf = initConfig()
 
@@ -22,6 +25,9 @@ func main() {
 	wnc = initWaves()
 
 	bot = initBot()
+
+	m = initMacaron()
+	m.Post("/", pageView)
 
 	initMonitor()
 }

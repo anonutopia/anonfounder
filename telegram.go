@@ -6,12 +6,13 @@ import (
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
+// Telegram group ID consts
 const (
-	tAnonBalkan = -1001161265502
-	tAnon       = -1001361489843
-	tAnonTaxi   = -1001422544298
-	tAnonTaxiP  = -1001271198034
-	tAnonOps    = -297434742
+	tAnonBalkan  = -1001161265502
+	tAnon        = -1001361489843
+	tAnonTaxi    = -1001422544298
+	tAnonTaxiPrv = -1001271198034
+	tAnonOps     = -297434742
 )
 
 func initBot() *tgbotapi.BotAPI {
