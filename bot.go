@@ -24,7 +24,7 @@ func executeBotCommand(tu TelegramUpdate) {
 		dropCommand(tu)
 	} else if strings.HasPrefix(tu.Message.Text, "/") {
 		unknownCommand(tu)
-	} else {
+	} else if tu.UpdateID != 0 {
 		avr, err := wnc.AddressValidate(tu.Message.Text)
 		if err != nil {
 			logTelegram(err.Error())
@@ -71,7 +71,8 @@ func dropCommand(tu TelegramUpdate) {
 	msgArr := strings.Fields(tu.Message.Text)
 	if len(msgArr) == 1 {
 		msg := tgbotapi.NewMessage(int64(tu.Message.Chat.ID), "Please enter your Waves address")
-		msg.ReplyMarkup = tgbotapi.ForceReply{ForceReply: true}
+		msg.ReplyMarkup = tgbotapi.ForceReply{ForceReply: true, Selective: true}
+		msg.ReplyToMessageID = tu.Message.MessageID
 		bot.Send(msg)
 	} else {
 		avr, err := wnc.AddressValidate(msgArr[1])
