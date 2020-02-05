@@ -59,7 +59,24 @@ type TelegramUpdate struct {
 			Type                        string `json:"type"`
 			AllMembersAreAdministrators bool   `json:"all_members_are_administrators"`
 		} `json:"chat"`
-		Date     int    `json:"date"`
+		Date           int `json:"date"`
+		ReplyToMessage struct {
+			MessageID int `json:"message_id"`
+			From      struct {
+				ID        int    `json:"id"`
+				IsBot     bool   `json:"is_bot"`
+				FirstName string `json:"first_name"`
+				Username  string `json:"username"`
+			} `json:"from"`
+			Chat struct {
+				ID                          int    `json:"id"`
+				Title                       string `json:"title"`
+				Type                        string `json:"type"`
+				AllMembersAreAdministrators bool   `json:"all_members_are_administrators"`
+			} `json:"chat"`
+			Date int    `json:"date"`
+			Text string `json:"text"`
+		} `json:"reply_to_message"`
 		Text     string `json:"text"`
 		Entities []struct {
 			Offset int    `json:"offset"`

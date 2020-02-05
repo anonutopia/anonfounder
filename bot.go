@@ -22,8 +22,21 @@ func executeBotCommand(tu TelegramUpdate) {
 		balanceCommand(tu)
 	} else if strings.HasPrefix(tu.Message.Text, "/drop") {
 		dropCommand(tu)
-	} else {
+	} else if strings.HasPrefix(tu.Message.Text, "/") {
 		unknownCommand(tu)
+	} else {
+		avr, err := wnc.AddressValidate(tu.Message.Text)
+		if err != nil {
+			logTelegram(err.Error())
+			messageTelegram("Something went wrong, please try again.", int64(tu.Message.Chat.ID))
+		} else {
+			if !avr.Valid {
+				messageTelegram("Your wallet address is not valid. Please check if it's correct and try again.", int64(tu.Message.Chat.ID))
+			} else {
+				tu.Message.Text = fmt.Sprintf("/drop %s", tu.Message.Text)
+				dropCommand(tu)
+			}
+		}
 	}
 }
 
@@ -57,7 +70,9 @@ func balanceCommand(tu TelegramUpdate) {
 func dropCommand(tu TelegramUpdate) {
 	msgArr := strings.Fields(tu.Message.Text)
 	if len(msgArr) == 1 {
-		messageTelegram("Wallet address is required. Please try again providing address this time (/drop address).", int64(tu.Message.Chat.ID))
+		msg := tgbotapi.NewMessage(int64(tu.Message.Chat.ID), "Please enter your Waves address")
+		msg.ReplyMarkup = tgbotapi.ForceReply{ForceReply: true}
+		bot.Send(msg)
 	} else {
 		avr, err := wnc.AddressValidate(msgArr[1])
 		if err != nil {
