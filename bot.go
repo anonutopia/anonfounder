@@ -25,6 +25,7 @@ func executeBotCommand(tu TelegramUpdate) {
 	} else if strings.HasPrefix(tu.Message.Text, "/") {
 		unknownCommand(tu)
 	} else if tu.UpdateID != 0 {
+		log.Println(tu.Message.Text)
 		avr, err := wnc.AddressValidate(tu.Message.Text)
 		if err != nil {
 			logTelegram(err.Error())
