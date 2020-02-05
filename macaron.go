@@ -12,12 +12,12 @@ func initMacaron() *macaron.Macaron {
 
 	m.Use(cache.Cacher())
 
-	certmagic.Default.Agreed = true
-	certmagic.Default.Email = "cryptopragmatic@protonmail.com"
-	if conf.Debug {
-		go m.Run("0.0.0.0", 5000)
-	} else {
+	if conf.SSL {
+		certmagic.Default.Agreed = true
+		certmagic.Default.Email = "cryptopragmatic@protonmail.com"
 		go certmagic.HTTPS([]string{"anonfounder.anonutopia.com"}, m)
+	} else {
+		go m.Run("0.0.0.0", 5000)
 	}
 
 	return m

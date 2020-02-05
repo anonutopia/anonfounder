@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/anonutopia/gowaves"
+	"github.com/go-macaron/binding"
 	"github.com/jinzhu/gorm"
 	macaron "gopkg.in/macaron.v1"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
@@ -27,7 +28,7 @@ func main() {
 	bot = initBot()
 
 	m = initMacaron()
-	m.Post("/", pageView)
+	m.Post("/", binding.Json(TelegramUpdate{}), pageView)
 
 	initMonitor()
 }

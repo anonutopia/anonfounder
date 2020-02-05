@@ -11,8 +11,10 @@ type Config struct {
 	WavesNodeAPIKey string `json:"waves_node_api_key"`
 	NodeAddress     string `json:"node_address"`
 	Debug           bool   `json:"debug"`
+	SSL             bool   `json:"ssl"`
 	TelegramAPIKey  string `json:"telegram_api_key"`
 	InitialPrice    uint64 `json:"initial_price"`
+	EmailAddress    string `json:"email_address"`
 }
 
 // Load method loads configuration file to Config struct
