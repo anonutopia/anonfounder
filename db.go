@@ -17,7 +17,7 @@ func initDb() *gorm.DB {
 	db.DB()
 	db.DB().Ping()
 	db.LogMode(conf.Debug)
-	db.AutoMigrate(&KeyValue{}, &Transaction{})
+	db.AutoMigrate(&KeyValue{}, &Transaction{}, &User{})
 
 	ks := &KeyValue{Key: "currentPrice", ValueInt: conf.InitialPrice}
 	db.FirstOrCreate(ks, ks)

@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/anonutopia/gowaves"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
@@ -19,6 +20,8 @@ func executeBotCommand(tu TelegramUpdate) {
 		addressCommand(tu)
 	} else if strings.HasPrefix(tu.Message.Text, "/balance") {
 		balanceCommand(tu)
+	} else if strings.HasPrefix(tu.Message.Text, "/drop") {
+		dropCommand(tu)
 	} else {
 		unknownCommand(tu)
 	}
@@ -48,6 +51,59 @@ func balanceCommand(tu TelegramUpdate) {
 		log.Printf("balanceCommand error: %s", err)
 	}
 	messageTelegram(fmt.Sprintf("My current Waves balance is: %.8f WAVES", float64(b.Balance)/float64(satInBtc)), int64(tu.Message.Chat.ID))
+}
+
+func dropCommand(tu TelegramUpdate) {
+	msgArr := strings.Fields(tu.Message.Text)
+	if len(msgArr) == 1 {
+		messageTelegram("Wallet address is required. Please try again providing address this time (/drop address).", int64(tu.Message.Chat.ID))
+	} else {
+		avr, err := wnc.AddressValidate(msgArr[1])
+		if err != nil {
+			logTelegram(err.Error())
+			messageTelegram("Something went wrong, please try again.", int64(tu.Message.Chat.ID))
+		} else {
+			if !avr.Valid {
+				messageTelegram("Your wallet address is not valid. Please check if it's correct and try again.", int64(tu.Message.Chat.ID))
+			} else {
+				user := &User{TelegramID: tu.Message.From.ID}
+				db.First(user, user)
+
+				if user.ID != 0 {
+					if user.Address == msgArr[1] {
+						messageTelegram("Your free token is already activated. You'll have to be a better hacker than that! 😆", int64(tu.Message.Chat.ID))
+					} else {
+						messageTelegram("This is already becoming some serious hacking? Obviously not serious enough. 😎", int64(tu.Message.Chat.ID))
+					}
+				} else {
+					if msgArr[1] == conf.NodeAddress {
+						messageTelegram("You need to use your wallet address, the one you get with Waves wallet.", int64(tu.Message.Chat.ID))
+					} else {
+						atr := &gowaves.AssetsTransferRequest{
+							Amount:    100000000,
+							AssetID:   conf.TokenID,
+							Fee:       100000,
+							Recipient: msgArr[1],
+							Sender:    conf.NodeAddress,
+						}
+
+						_, err := wnc.AssetsTransfer(atr)
+						if err != nil {
+							messageTelegram("Something went wrong, please try again.", int64(tu.Message.Chat.ID))
+							logTelegram(err.Error())
+						} else {
+							user.TelegramID = tu.Message.From.ID
+							user.TelegramUsername = tu.Message.From.Username
+							user.Address = msgArr[1]
+							db.Save(user)
+
+							messageTelegram("I've sent you your 1 free token. Welcome! 🚀", int64(tu.Message.Chat.ID))
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 func unknownCommand(tu TelegramUpdate) {

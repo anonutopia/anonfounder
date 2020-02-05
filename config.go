@@ -15,6 +15,7 @@ type Config struct {
 	TelegramAPIKey  string `json:"telegram_api_key"`
 	InitialPrice    uint64 `json:"initial_price"`
 	EmailAddress    string `json:"email_address"`
+	TokenID         string `json:"token_id"`
 }
 
 // Load method loads configuration file to Config struct
