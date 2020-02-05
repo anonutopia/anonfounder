@@ -47,7 +47,7 @@ func balanceCommand(tu TelegramUpdate) {
 	if err != nil {
 		log.Printf("balanceCommand error: %s", err)
 	}
-	messageTelegram(fmt.Sprintf("My current Waves balance is: %.3f WAVES", float64(b.Balance)/float64(satInBtc)), int64(tu.Message.Chat.ID))
+	messageTelegram(fmt.Sprintf("My current Waves balance is: %.8f WAVES", float64(b.Balance)/float64(satInBtc)), int64(tu.Message.Chat.ID))
 }
 
 func unknownCommand(tu TelegramUpdate) {
