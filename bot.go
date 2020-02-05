@@ -22,6 +22,8 @@ func executeBotCommand(tu TelegramUpdate) {
 		balanceCommand(tu)
 	} else if strings.HasPrefix(tu.Message.Text, "/drop") {
 		dropCommand(tu)
+	} else if strings.HasPrefix(tu.Message.Text, "/freeinfo") {
+		freeinfoCommand(tu)
 	} else if strings.HasPrefix(tu.Message.Text, "/") {
 		unknownCommand(tu)
 	} else if tu.UpdateID != 0 {
@@ -75,6 +77,13 @@ func balanceCommand(tu TelegramUpdate) {
 }
 
 func dropCommand(tu TelegramUpdate) {
+	kv := &KeyValue{Key: "airdropSent"}
+	db.First(kv, kv)
+	if kv.ValueInt >= conf.Airdrop {
+		messageTelegram("We are sorry to inform you that token airdrop has already finished.", int64(tu.Message.Chat.ID))
+		return
+	}
+
 	msgArr := strings.Fields(tu.Message.Text)
 	if len(msgArr) == 1 {
 		msg := tgbotapi.NewMessage(int64(tu.Message.Chat.ID), "Please enter your Waves address")
@@ -121,6 +130,9 @@ func dropCommand(tu TelegramUpdate) {
 							user.Address = msgArr[1]
 							db.Save(user)
 
+							kv.ValueInt = kv.ValueInt + 1
+							db.Save(kv)
+
 							messageTelegram("I've sent you your 1 free token. Welcome! 🚀", int64(tu.Message.Chat.ID))
 						}
 					}
@@ -128,6 +140,18 @@ func dropCommand(tu TelegramUpdate) {
 			}
 		}
 	}
+}
+
+func freeinfoCommand(tu TelegramUpdate) {
+	kv := &KeyValue{Key: "airdropSent"}
+	db.First(kv, kv)
+	msg := fmt.Sprintf("Tokens dropped so far: <strong>%d ATST</strong>\nTokens left to drop: <strong>%d ATST</strong>", kv.ValueInt, (conf.Airdrop - kv.ValueInt))
+	log.Println(msg)
+	m := tgbotapi.NewMessage(int64(tu.Message.Chat.ID), msg)
+	m.ParseMode = "HTML"
+	err, e := bot.Send(m)
+	log.Println(err)
+	log.Println(e)
 }
 
 func unknownCommand(tu TelegramUpdate) {

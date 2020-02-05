@@ -22,5 +22,8 @@ func initDb() *gorm.DB {
 	ks := &KeyValue{Key: "currentPrice", ValueInt: conf.InitialPrice}
 	db.FirstOrCreate(ks, ks)
 
+	ks = &KeyValue{Key: "airdropSent", ValueInt: 0}
+	db.FirstOrCreate(ks, ks)
+
 	return db
 }

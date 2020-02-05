@@ -16,6 +16,7 @@ type Config struct {
 	InitialPrice    uint64 `json:"initial_price"`
 	EmailAddress    string `json:"email_address"`
 	TokenID         string `json:"token_id"`
+	Airdrop         uint64 `json:"airdrop"`
 }
 
 // Load method loads configuration file to Config struct
