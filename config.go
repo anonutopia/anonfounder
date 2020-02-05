@@ -32,7 +32,7 @@ func (sc *Config) Load(configFile string) error {
 	err = decoder.Decode(&sc)
 
 	if err != nil {
-		log.Printf("[Config.Load] Got error while decoding JSON: %v", err)
+		log.Printf("[Config.Load] Error while decoding JSON: %v", err)
 		return err
 	}
 
