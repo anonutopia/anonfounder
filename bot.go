@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
@@ -28,7 +27,8 @@ func executeBotCommand(tu TelegramUpdate) {
 func priceCommand(tu TelegramUpdate) {
 	kv := &KeyValue{Key: "currentPrice"}
 	db.First(kv, kv)
-	messageTelegram(fmt.Sprintf("Current token price is: %s €", strconv.Itoa(int(kv.ValueInt))), int64(tu.Message.Chat.ID))
+	price := float64(kv.ValueInt) / float64(satInBtc)
+	messageTelegram(fmt.Sprintf("Current token price is: %.8f €", price), int64(tu.Message.Chat.ID))
 }
 
 func startCommand(tu TelegramUpdate) {
