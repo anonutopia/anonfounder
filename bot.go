@@ -5,6 +5,8 @@ import (
 	"log"
 	"strconv"
 	"strings"
+
+	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
 const satInBtc = uint64(100000000)
@@ -36,6 +38,8 @@ func startCommand(tu TelegramUpdate) {
 func addressCommand(tu TelegramUpdate) {
 	messageTelegram("My main Waves address is:", int64(tu.Message.Chat.ID))
 	messageTelegram(conf.NodeAddress, int64(tu.Message.Chat.ID))
+	pc := tgbotapi.NewPhotoUpload(int64(tu.Message.Chat.ID), "qrcode.png")
+	bot.Send(pc)
 }
 
 func balanceCommand(tu TelegramUpdate) {
