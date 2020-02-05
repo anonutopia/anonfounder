@@ -42,6 +42,7 @@ func addressCommand(tu TelegramUpdate) {
 	messageTelegram("My main Waves address is:", int64(tu.Message.Chat.ID))
 	messageTelegram(conf.NodeAddress, int64(tu.Message.Chat.ID))
 	pc := tgbotapi.NewPhotoUpload(int64(tu.Message.Chat.ID), "qrcode.png")
+	pc.Caption = "QR Code"
 	bot.Send(pc)
 }
 
