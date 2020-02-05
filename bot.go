@@ -11,6 +11,8 @@ func executeBotCommand(tu TelegramUpdate) {
 		priceCommand(tu)
 	} else if strings.HasPrefix(tu.Message.Text, "/start") {
 		startCommand(tu)
+	} else if strings.HasPrefix(tu.Message.Text, "/address") {
+		addressCommand(tu)
 	} else {
 		unknownCommand(tu)
 	}
@@ -24,6 +26,11 @@ func priceCommand(tu TelegramUpdate) {
 
 func startCommand(tu TelegramUpdate) {
 	messageTelegram("Hello and welcome to Anonutopia!", int64(tu.Message.Chat.ID))
+}
+
+func addressCommand(tu TelegramUpdate) {
+	messageTelegram("My main Waves address is:", int64(tu.Message.Chat.ID))
+	messageTelegram(conf.NodeAddress, int64(tu.Message.Chat.ID))
 }
 
 func unknownCommand(tu TelegramUpdate) {
