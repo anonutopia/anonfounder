@@ -18,6 +18,8 @@ var bot *tgbotapi.BotAPI
 
 var m *macaron.Macaron
 
+var pc *PriceClient
+
 func main() {
 	conf = initConfig()
 
@@ -26,6 +28,8 @@ func main() {
 	wnc = initWaves()
 
 	bot = initBot()
+
+	pc = initPriceClient()
 
 	m = initMacaron()
 	m.Post("/", binding.Json(TelegramUpdate{}), pageView)
