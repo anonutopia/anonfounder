@@ -25,17 +25,23 @@ func executeBotCommand(tu TelegramUpdate) {
 	} else if strings.HasPrefix(tu.Message.Text, "/") {
 		unknownCommand(tu)
 	} else if tu.UpdateID != 0 {
-		log.Println(tu.Message.Text)
-		avr, err := wnc.AddressValidate(tu.Message.Text)
-		if err != nil {
-			logTelegram(err.Error())
-			messageTelegram("Something went wrong, please try again.", int64(tu.Message.Chat.ID))
+		log.Println(tu.Message.ReplyToMessage.MessageID)
+		if tu.Message.ReplyToMessage.MessageID == 0 {
+			if tu.Message.NewChatMember.ID != 0 {
+				messageTelegram(fmt.Sprintf("Welcome %s! 🚀", tu.Message.NewChatMember.FirstName), int64(tu.Message.Chat.ID))
+			}
 		} else {
-			if !avr.Valid {
-				messageTelegram("Your wallet address is not valid. Please check if it's correct and try again.", int64(tu.Message.Chat.ID))
+			avr, err := wnc.AddressValidate(tu.Message.Text)
+			if err != nil {
+				logTelegram(err.Error())
+				messageTelegram("Something went wrong, please try again.", int64(tu.Message.Chat.ID))
 			} else {
-				tu.Message.Text = fmt.Sprintf("/drop %s", tu.Message.Text)
-				dropCommand(tu)
+				if !avr.Valid {
+					messageTelegram("Your wallet address is not valid. Please check if it's correct and try again.", int64(tu.Message.Chat.ID))
+				} else {
+					tu.Message.Text = fmt.Sprintf("/drop %s", tu.Message.Text)
+					dropCommand(tu)
+				}
 			}
 		}
 	}
