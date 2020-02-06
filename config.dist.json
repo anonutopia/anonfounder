@@ -6,5 +6,8 @@
     "initial_price": 0,
     "telegram_api_key": "",
     "email_address": "",
-    "token_id": ""
+    "token_id": "",
+    "airdrop": 1000,
+    "founder_address": "",
+    "founder_factor": 0.8
 }

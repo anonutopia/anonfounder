@@ -8,15 +8,17 @@ import (
 
 // Config struct holds all our configuration
 type Config struct {
-	WavesNodeAPIKey string `json:"waves_node_api_key"`
-	NodeAddress     string `json:"node_address"`
-	Debug           bool   `json:"debug"`
-	SSL             bool   `json:"ssl"`
-	TelegramAPIKey  string `json:"telegram_api_key"`
-	InitialPrice    uint64 `json:"initial_price"`
-	EmailAddress    string `json:"email_address"`
-	TokenID         string `json:"token_id"`
-	Airdrop         uint64 `json:"airdrop"`
+	WavesNodeAPIKey string  `json:"waves_node_api_key"`
+	NodeAddress     string  `json:"node_address"`
+	Debug           bool    `json:"debug"`
+	SSL             bool    `json:"ssl"`
+	TelegramAPIKey  string  `json:"telegram_api_key"`
+	InitialPrice    uint64  `json:"initial_price"`
+	EmailAddress    string  `json:"email_address"`
+	TokenID         string  `json:"token_id"`
+	Airdrop         uint64  `json:"airdrop"`
+	FounderAddress  string  `json:"founder_address"`
+	FounderFactor   float64 `json:"founder_factor"`
 }
 
 // Load method loads configuration file to Config struct
