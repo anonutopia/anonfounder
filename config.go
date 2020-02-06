@@ -19,6 +19,7 @@ type Config struct {
 	Airdrop         uint64  `json:"airdrop"`
 	FounderAddress  string  `json:"founder_address"`
 	FounderFactor   float64 `json:"founder_factor"`
+	BuyFactor       float64 `json:"buy_factor"`
 }
 
 // Load method loads configuration file to Config struct
