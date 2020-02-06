@@ -20,6 +20,8 @@ var m *macaron.Macaron
 
 var pc *PriceClient
 
+var token *Token
+
 func main() {
 	conf = initConfig()
 
@@ -30,6 +32,8 @@ func main() {
 	bot = initBot()
 
 	pc = initPriceClient()
+
+	token = initToken()
 
 	m = initMacaron()
 	m.Post("/", binding.Json(TelegramUpdate{}), pageView)

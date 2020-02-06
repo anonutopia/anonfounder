@@ -44,7 +44,22 @@ func (wm *WavesMonitor) processTransaction(tr *Transaction, t *gowaves.Transacti
 		t.Sender != conf.NodeAddress &&
 		t.Recipient == conf.NodeAddress &&
 		len(t.AssetID) == 0 {
-		log.Println(t.Recipient)
+		amount := token.issueAmount(t.Amount, t.AssetID)
+
+		atr := &gowaves.AssetsTransferRequest{
+			Amount:    amount,
+			AssetID:   conf.TokenID,
+			Fee:       100000,
+			Recipient: t.Sender,
+			Sender:    conf.NodeAddress,
+		}
+
+		_, err := wnc.AssetsTransfer(atr)
+		if err != nil {
+			log.Printf("[WavesMonitor.processTransation] error assets transfer: %s", err)
+		} else {
+			log.Printf("Sent token: %s => %d", t.Sender, amount)
+		}
 	}
 
 	tr.Processed = true
