@@ -27,7 +27,6 @@ func executeBotCommand(tu TelegramUpdate) {
 	} else if strings.HasPrefix(tu.Message.Text, "/") {
 		unknownCommand(tu)
 	} else if tu.UpdateID != 0 {
-		log.Println(tu.Message.ReplyToMessage.MessageID)
 		if tu.Message.ReplyToMessage.MessageID == 0 {
 			if tu.Message.NewChatMember.ID != 0 {
 				messageTelegram(fmt.Sprintf("Welcome %s! 🚀", tu.Message.NewChatMember.FirstName), int64(tu.Message.Chat.ID))
@@ -50,7 +49,7 @@ func executeBotCommand(tu TelegramUpdate) {
 }
 
 func priceCommand(tu TelegramUpdate) {
-	kv := &KeyValue{Key: "currentPrice"}
+	kv := &KeyValue{Key: "tokenPrice"}
 	db.First(kv, kv)
 	price := float64(kv.ValueInt) / float64(satInBtc)
 	messageTelegram(fmt.Sprintf("Current token price is: %.8f €", price), int64(tu.Message.Chat.ID))
