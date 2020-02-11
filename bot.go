@@ -6,10 +6,13 @@ import (
 	"strings"
 
 	"github.com/anonutopia/gowaves"
+	ui18n "github.com/unknwon/i18n"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
 const satInBtc = uint64(100000000)
+
+const lang = "hr"
 
 func executeBotCommand(tu TelegramUpdate) {
 	if strings.HasPrefix(tu.Message.Text, "/price") {
@@ -29,16 +32,16 @@ func executeBotCommand(tu TelegramUpdate) {
 	} else if tu.UpdateID != 0 {
 		if tu.Message.ReplyToMessage.MessageID == 0 {
 			if tu.Message.NewChatMember.ID != 0 {
-				messageTelegram(fmt.Sprintf("Welcome %s! 🚀", tu.Message.NewChatMember.FirstName), int64(tu.Message.Chat.ID))
+				messageTelegram(fmt.Sprintf(ui18n.Tr(lang, "welcome"), tu.Message.NewChatMember.FirstName), int64(tu.Message.Chat.ID))
 			}
 		} else {
 			avr, err := wnc.AddressValidate(tu.Message.Text)
 			if err != nil {
 				logTelegram(err.Error())
-				messageTelegram("Something went wrong, please try again.", int64(tu.Message.Chat.ID))
+				messageTelegram(ui18n.Tr(lang, "error"), int64(tu.Message.Chat.ID))
 			} else {
 				if !avr.Valid {
-					messageTelegram("Your wallet address is not valid. Please check if it's correct and try again.", int64(tu.Message.Chat.ID))
+					messageTelegram(ui18n.Tr(lang, "addressNotValid"), int64(tu.Message.Chat.ID))
 				} else {
 					tu.Message.Text = fmt.Sprintf("/drop %s", tu.Message.Text)
 					dropCommand(tu)
@@ -52,7 +55,7 @@ func priceCommand(tu TelegramUpdate) {
 	kv := &KeyValue{Key: "tokenPrice"}
 	db.First(kv, kv)
 	price := float64(kv.ValueInt) / float64(satInBtc)
-	messageTelegram(fmt.Sprintf("Current token price is: %.8f €", price), int64(tu.Message.Chat.ID))
+	messageTelegram(fmt.Sprintf(ui18n.Tr(lang, "currentPrice"), price), int64(tu.Message.Chat.ID))
 }
 
 func startCommand(tu TelegramUpdate) {
@@ -60,7 +63,7 @@ func startCommand(tu TelegramUpdate) {
 }
 
 func addressCommand(tu TelegramUpdate) {
-	messageTelegram("My main Waves address is:", int64(tu.Message.Chat.ID))
+	messageTelegram(ui18n.Tr(lang, "myAddress"), int64(tu.Message.Chat.ID))
 	messageTelegram(conf.NodeAddress, int64(tu.Message.Chat.ID))
 	pc := tgbotapi.NewPhotoUpload(int64(tu.Message.Chat.ID), "qrcode.png")
 	pc.Caption = "QR Code"
@@ -72,14 +75,14 @@ func balanceCommand(tu TelegramUpdate) {
 	if err != nil {
 		log.Printf("balanceCommand error: %s", err)
 	}
-	messageTelegram(fmt.Sprintf("My current Waves balance is: %.8f WAVES", float64(b.Balance)/float64(satInBtc)), int64(tu.Message.Chat.ID))
+	messageTelegram(fmt.Sprintf(ui18n.Tr(lang, "currentBalance"), float64(b.Balance)/float64(satInBtc)), int64(tu.Message.Chat.ID))
 }
 
 func dropCommand(tu TelegramUpdate) {
 	kv := &KeyValue{Key: "airdropSent"}
 	db.First(kv, kv)
 	if kv.ValueInt >= conf.Airdrop {
-		messageTelegram("We are sorry to inform you that token airdrop has already finished.", int64(tu.Message.Chat.ID))
+		messageTelegram(ui18n.Tr(lang, "airdropFinished"), int64(tu.Message.Chat.ID))
 		return
 	}
 
@@ -93,23 +96,23 @@ func dropCommand(tu TelegramUpdate) {
 		avr, err := wnc.AddressValidate(msgArr[1])
 		if err != nil {
 			logTelegram(err.Error())
-			messageTelegram("Something went wrong, please try again.", int64(tu.Message.Chat.ID))
+			messageTelegram(ui18n.Tr(lang, "error"), int64(tu.Message.Chat.ID))
 		} else {
 			if !avr.Valid {
-				messageTelegram("Your wallet address is not valid. Please check if it's correct and try again.", int64(tu.Message.Chat.ID))
+				messageTelegram(ui18n.Tr(lang, "addressNotValid"), int64(tu.Message.Chat.ID))
 			} else {
 				user := &User{TelegramID: tu.Message.From.ID}
 				db.First(user, user)
 
 				if user.ID != 0 {
 					if user.Address == msgArr[1] {
-						messageTelegram("Your free token is already activated. You'll have to be a better hacker than that! 😆", int64(tu.Message.Chat.ID))
+						messageTelegram(ui18n.Tr(lang, "alreadyActivated"), int64(tu.Message.Chat.ID))
 					} else {
-						messageTelegram("This is already becoming some serious hacking? Obviously not serious enough. 😎", int64(tu.Message.Chat.ID))
+						messageTelegram(ui18n.Tr(lang, "hacker"), int64(tu.Message.Chat.ID))
 					}
 				} else {
 					if msgArr[1] == conf.NodeAddress {
-						messageTelegram("You need to use your wallet address, the one you get with Waves wallet.", int64(tu.Message.Chat.ID))
+						messageTelegram(ui18n.Tr(lang, "yourAddress"), int64(tu.Message.Chat.ID))
 					} else {
 						atr := &gowaves.AssetsTransferRequest{
 							Amount:    100000000,
@@ -121,7 +124,7 @@ func dropCommand(tu TelegramUpdate) {
 
 						_, err := wnc.AssetsTransfer(atr)
 						if err != nil {
-							messageTelegram("Something went wrong, please try again.", int64(tu.Message.Chat.ID))
+							messageTelegram(ui18n.Tr(lang, "error"), int64(tu.Message.Chat.ID))
 							logTelegram(err.Error())
 						} else {
 							user.TelegramID = tu.Message.From.ID
@@ -132,7 +135,7 @@ func dropCommand(tu TelegramUpdate) {
 							kv.ValueInt = kv.ValueInt + 1
 							db.Save(kv)
 
-							messageTelegram("I've sent you your 1 free token. Welcome! 🚀", int64(tu.Message.Chat.ID))
+							messageTelegram(ui18n.Tr(lang, "tokenSent"), int64(tu.Message.Chat.ID))
 						}
 					}
 				}
@@ -154,5 +157,5 @@ func freeinfoCommand(tu TelegramUpdate) {
 }
 
 func unknownCommand(tu TelegramUpdate) {
-	messageTelegram("This command doesn't exist.", int64(tu.Message.Chat.ID))
+	messageTelegram(ui18n.Tr(lang, "commandNotAvailable"), int64(tu.Message.Chat.ID))
 }
