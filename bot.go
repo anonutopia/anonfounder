@@ -112,7 +112,7 @@ func dropCommand(tu TelegramUpdate) {
 
 	msgArr := strings.Fields(tu.Message.Text)
 	if len(msgArr) == 1 {
-		msg := tgbotapi.NewMessage(int64(tu.Message.Chat.ID), "Please enter your Waves address")
+		msg := tgbotapi.NewMessage(int64(tu.Message.Chat.ID), ui18n.Tr(lang, "pleaseEnter"))
 		msg.ReplyMarkup = tgbotapi.ForceReply{ForceReply: true, Selective: true}
 		msg.ReplyToMessageID = tu.Message.MessageID
 		bot.Send(msg)
