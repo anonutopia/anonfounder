@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
+	ui18n "github.com/unknwon/i18n"
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
@@ -38,6 +40,16 @@ func logTelegram(message string) {
 
 func messageTelegram(message string, groupID int64) {
 	msg := tgbotapi.NewMessage(groupID, message)
+	bot.Send(msg)
+}
+
+func sendGroupsMessageInvestment(investment float64) {
+	msg := tgbotapi.NewMessage(tAnonTaxi, fmt.Sprintf(ui18n.Tr(lang, "newPurchase"), investment))
+	bot.Send(msg)
+}
+
+func sendGroupsMessagePrice(newPrice float64) {
+	msg := tgbotapi.NewMessage(tAnonTaxi, fmt.Sprintf(ui18n.Tr(lang, "priceRise"), newPrice))
 	bot.Send(msg)
 }
 

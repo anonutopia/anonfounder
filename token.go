@@ -32,7 +32,7 @@ func (t *Token) issueAmount(investment int, assetID string) int {
 
 	priceChanged := false
 	investmentEur = float64(investment) / float64(satInBtc) / cryptoPrice
-	// sendGroupsMessageInvestment(investmentEur)
+	sendGroupsMessageInvestment(investmentEur)
 	log.Println(investmentEur)
 
 	for investment > 10 {
@@ -87,7 +87,7 @@ func (t *Token) issueAmount(investment int, assetID string) int {
 
 	if priceChanged {
 		newPrice := float64(t.Price) / float64(satInBtc)
-		// sendGroupsMessagePrice(newPrice)
+		sendGroupsMessagePrice(newPrice)
 		log.Println(newPrice)
 	}
 
