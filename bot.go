@@ -33,6 +33,30 @@ func executeBotCommand(tu TelegramUpdate) {
 		if tu.Message.ReplyToMessage.MessageID == 0 {
 			if tu.Message.NewChatMember.ID != 0 {
 				messageTelegram(fmt.Sprintf(ui18n.Tr(lang, "welcome"), tu.Message.NewChatMember.FirstName), int64(tu.Message.Chat.ID))
+				rUser := &User{TelegramID: tu.Message.From.ID}
+				db.First(rUser, rUser)
+
+				if len(rUser.Address) > 0 {
+					atr := &gowaves.AssetsTransferRequest{
+						Amount:    50000000,
+						AssetID:   conf.TokenID,
+						Fee:       100000,
+						Recipient: rUser.Address,
+						Sender:    conf.NodeAddress,
+					}
+
+					_, err := wnc.AssetsTransfer(atr)
+					if err != nil {
+						messageTelegram(ui18n.Tr(lang, "error"), int64(tu.Message.Chat.ID))
+						logTelegram(err.Error())
+					} else {
+						kv := &KeyValue{Key: "airdropSent"}
+						kv.ValueInt = kv.ValueInt + 1
+						db.Save(kv)
+
+						messageTelegram(fmt.Sprintf(ui18n.Tr(lang, "tokenSentR"), tu.Message.From.FirstName), int64(tu.Message.Chat.ID))
+					}
+				}
 			}
 		} else {
 			avr, err := wnc.AddressValidate(tu.Message.Text)
