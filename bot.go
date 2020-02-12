@@ -31,7 +31,7 @@ func executeBotCommand(tu TelegramUpdate) {
 		unknownCommand(tu)
 	} else if tu.UpdateID != 0 {
 		if tu.Message.ReplyToMessage.MessageID == 0 {
-			if tu.Message.NewChatMember.ID != 0 {
+			if tu.Message.NewChatMember.ID != 0 && !tu.Message.NewChatMember.IsBot {
 				messageTelegram(fmt.Sprintf(ui18n.Tr(lang, "welcome"), tu.Message.NewChatMember.FirstName), int64(tu.Message.Chat.ID))
 				rUser := &User{TelegramID: tu.Message.From.ID}
 				db.First(rUser, rUser)
