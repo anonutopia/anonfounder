@@ -25,4 +25,6 @@ type User struct {
 	Address          string `sql:"size:255;unique_index"`
 	TelegramUsername string `sql:"size:255"`
 	TelegramID       int    `sql:"unique_index"`
+	ReferralID       uint
+	Referral         *User
 }

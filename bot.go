@@ -31,32 +31,9 @@ func executeBotCommand(tu TelegramUpdate) {
 		unknownCommand(tu)
 	} else if tu.UpdateID != 0 {
 		if tu.Message.ReplyToMessage.MessageID == 0 {
-			if tu.Message.NewChatMember.ID != 0 && !tu.Message.NewChatMember.IsBot {
-				messageTelegram(fmt.Sprintf(ui18n.Tr(lang, "welcome"), tu.Message.NewChatMember.FirstName), int64(tu.Message.Chat.ID))
-				rUser := &User{TelegramID: tu.Message.From.ID}
-				db.First(rUser, rUser)
-
-				if len(rUser.Address) > 0 {
-					atr := &gowaves.AssetsTransferRequest{
-						Amount:    50000000,
-						AssetID:   conf.TokenID,
-						Fee:       100000,
-						Recipient: rUser.Address,
-						Sender:    conf.NodeAddress,
-					}
-
-					_, err := wnc.AssetsTransfer(atr)
-					if err != nil {
-						messageTelegram(ui18n.Tr(lang, "error"), int64(tu.Message.Chat.ID))
-						logTelegram(err.Error())
-					} else {
-						kv := &KeyValue{Key: "airdropSent"}
-						kv.ValueInt = kv.ValueInt + 1
-						db.Save(kv)
-
-						messageTelegram(fmt.Sprintf(ui18n.Tr(lang, "tokenSentR"), tu.Message.From.FirstName), int64(tu.Message.Chat.ID))
-					}
-				}
+			if tu.Message.NewChatMember.ID != 0 &&
+				!tu.Message.NewChatMember.IsBot {
+				registerNewUsers(tu)
 			}
 		} else {
 			avr, err := wnc.AddressValidate(tu.Message.Text)
@@ -72,6 +49,19 @@ func executeBotCommand(tu TelegramUpdate) {
 				}
 			}
 		}
+	}
+}
+
+func registerNewUsers(tu TelegramUpdate) {
+	rUser := &User{TelegramID: tu.Message.From.ID}
+	db.First(rUser, rUser)
+
+	for _, user := range tu.Message.NewChatMembers {
+		messageTelegram(fmt.Sprintf(ui18n.Tr(lang, "welcome"), tu.Message.NewChatMember.FirstName), int64(tu.Message.Chat.ID))
+
+		u := &User{TelegramID: user.ID, TelegramUsername: user.Username, ReferralID: rUser.ID}
+		err := db.FirstOrCreate(u, u)
+		log.Println(err)
 	}
 }
 
@@ -111,7 +101,7 @@ func dropCommand(tu TelegramUpdate) {
 	}
 
 	msgArr := strings.Fields(tu.Message.Text)
-	if len(msgArr) == 1 {
+	if len(msgArr) == 1 && strings.HasPrefix(tu.Message.Text, "/drop") {
 		msg := tgbotapi.NewMessage(int64(tu.Message.Chat.ID), ui18n.Tr(lang, "pleaseEnter"))
 		msg.ReplyMarkup = tgbotapi.ForceReply{ForceReply: true, Selective: true}
 		msg.ReplyToMessageID = tu.Message.MessageID
@@ -128,7 +118,7 @@ func dropCommand(tu TelegramUpdate) {
 				user := &User{TelegramID: tu.Message.From.ID}
 				db.First(user, user)
 
-				if user.ID != 0 {
+				if len(user.Address) > 0 {
 					if user.Address == msgArr[1] {
 						messageTelegram(ui18n.Tr(lang, "alreadyActivated"), int64(tu.Message.Chat.ID))
 					} else {
@@ -157,9 +147,31 @@ func dropCommand(tu TelegramUpdate) {
 							db.Save(user)
 
 							kv.ValueInt = kv.ValueInt + 1
+
+							if user.ReferralID != 0 {
+								rUser := &User{}
+								db.First(rUser, user.ReferralID)
+								if len(rUser.Address) > 0 {
+									atr := &gowaves.AssetsTransferRequest{
+										Amount:    50000000,
+										AssetID:   conf.TokenID,
+										Fee:       100000,
+										Recipient: rUser.Address,
+										Sender:    conf.NodeAddress,
+									}
+
+									_, err := wnc.AssetsTransfer(atr)
+									if err != nil {
+										logTelegram(err.Error())
+									} else {
+										messageTelegram(fmt.Sprintf(ui18n.Tr(lang, "tokenSentR"), rUser.TelegramUsername), int64(tu.Message.Chat.ID))
+									}
+								}
+							}
+
 							db.Save(kv)
 
-							messageTelegram(ui18n.Tr(lang, "tokenSent"), int64(tu.Message.Chat.ID))
+							messageTelegram(fmt.Sprintf(ui18n.Tr(lang, "tokenSent"), tu.Message.From.Username), int64(tu.Message.Chat.ID))
 						}
 					}
 				}
