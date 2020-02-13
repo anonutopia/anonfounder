@@ -9,5 +9,7 @@
     "token_id": "",
     "airdrop": 1000,
     "founder_address": "",
-    "founder_factor": 0.8
+    "founder_factor": 0.8,
+    "buy_factor": 0.9,
+    "hostname": ""
 }
