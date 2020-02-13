@@ -20,6 +20,7 @@ type Config struct {
 	FounderAddress  string  `json:"founder_address"`
 	FounderFactor   float64 `json:"founder_factor"`
 	BuyFactor       float64 `json:"buy_factor"`
+	Hostname        float64 `json:"hostname"`
 }
 
 // Load method loads configuration file to Config struct
